@@ -18,7 +18,11 @@ const {
   GetGoogleLoginLink,
 } = require("./severModules/googleSignIn");
 const { CheckEmailValidity, RegisterUser } = require("./severModules/signUp");
-const { AddMember } = require("./severModules/family/addMember");
+const {
+  AddMember,
+  DeleteMember,
+  UpdateMember,
+} = require("./severModules/family/memberActions");
 const { CreateFamily } = require("./severModules/family");
 
 const app = express();
@@ -115,6 +119,26 @@ app.post("/familyTree/add", async (req, res) => {
   console.log(req.body);
   try {
     await AddMember(req, res);
+  } catch (error) {
+    console.log("🚀 ~ file: server.js:111 ~ app.post ~ error", error);
+    res.status(400).send({ message: "Error!!" });
+  }
+});
+
+app.put("/familyTree/update", async (req, res) => {
+  console.log(req.body);
+  try {
+    await UpdateMember(req, res);
+  } catch (error) {
+    console.log("🚀 ~ file: server.js:111 ~ app.post ~ error", error);
+    res.status(400).send({ message: "Error!!" });
+  }
+});
+
+app.post("/familyTree/delete", async (req, res) => {
+  console.log(req.body);
+  try {
+    await DeleteMember(req, res);
   } catch (error) {
     console.log("🚀 ~ file: server.js:111 ~ app.post ~ error", error);
     res.status(400).send({ message: "Error!!" });
