@@ -146,5 +146,5 @@ app.post("/familyTree/delete", async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log("server running");
+  console.log("Server running");
 });
