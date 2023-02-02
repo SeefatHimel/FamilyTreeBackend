@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "dev",
-    "build": "npm run build",
+    "build": "npm install",
     "start": "nodemon src/server.js",
     "dev": "nodemon src/server.js"
   },
