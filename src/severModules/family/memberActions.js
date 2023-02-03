@@ -71,7 +71,58 @@ async function AddMember(req, res) {
     }
   }
 }
+async function AddOriginMember(req, res) {
+  const { familyId, data } = req.body;
+  const Member = require("../../models/familyMember")(familyId);
 
+  const sameName = await Member.where("name").equals(data.name).clone();
+  if (sameName && sameName[0]) {
+    console.log("sameName", sameName);
+    res.status(401).send({
+      message: "Name Already used.",
+    });
+  } else {
+    try {
+      let parents = [];
+      let children = [];
+      let spouse = [];
+      const newMemberId = uuidv4();
+      if (data?.relation) {
+        if (data.relation === "Parent") {
+          children.push(rMember.id);
+          rMember.parents.push(newMemberId);
+        }
+        if (data.relation === "Child" || data.relation === "Sibling") {
+          parents.push(rMember.id);
+          rMember.children.push(newMemberId);
+        }
+        if (data.relation === "Spouse") {
+          spouse.push(rMember.id);
+          rMember.spouse.push(newMemberId);
+        }
+      }
+      const member = await Member.create({
+        id: newMemberId,
+        name: data.name,
+        imgLink: data.imgLink,
+        gender: data.gender,
+        parents: parents,
+        children: children,
+        spouse: spouse,
+      });
+
+      console.log("Origin Member Added ", member);
+      res.status(201).send({
+        message: "Origin Member added successfully.",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({
+        message: "Failed to add Origin Member.",
+      });
+    }
+  }
+}
 async function DeleteChildren(Member, id) {
   console.log("🚀 ~ file: addMember.js:75 ~ DeleteChildren ~ id", id);
   let tmpMem = await Member.where("id").equals(id).clone();
@@ -231,4 +282,4 @@ async function UpdateMember(req, res) {
   }
 }
 
-module.exports = { AddMember, DeleteMember, UpdateMember };
+module.exports = { AddMember, AddOriginMember, DeleteMember, UpdateMember };

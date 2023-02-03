@@ -46,6 +46,44 @@ async function CreateFamily(req, res) {
   }
 }
 
+async function GetFamilyMembers(req, res) {
+  const familyId = req.query.familyId ? req.query.familyId : req.body.familyId;
+
+  console.log("🚀 ~ file: index.js:51 ~ GetFamilyMembers ~ familyId", familyId);
+  const fDetails = await FamilyList.where("id").equals(familyId);
+  const familyName = fDetails[0].name;
+  console.log(
+    "🚀 ~ file: index.js:54 ~ GetFamilyMembers ~ familyName",
+    familyName
+  );
+  if (familyName) {
+    try {
+      const Members = require("../../models/familyMember")(familyId);
+      const members = await Members.find();
+      console.log(
+        "🚀 ~ file: index.js:56 ~ GetFamilyMembers ~ members",
+        members
+      );
+      res.send({
+        id: familyId,
+        details: {
+          name: familyName,
+          members: members,
+        },
+        message: "Family details acquired",
+      });
+    } catch (error) {
+      console.log("GetFamilyMembers Error ", error);
+      res.status(400).send({
+        message: "Failed to Acquire Family Details",
+      });
+    }
+  } else
+    res.status(404).send({
+      message: "Family Not Found",
+    });
+}
+
 async function GetFamily(req, res) {
   console.log("Name : ", req.body.name, " Pass : ", req.body.password);
   if (!req.body.name) {
@@ -100,4 +138,4 @@ async function GetFamily(req, res) {
   }
 }
 
-module.exports = { CreateFamily };
+module.exports = { CreateFamily, GetFamilyMembers };

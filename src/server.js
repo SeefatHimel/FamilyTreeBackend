@@ -22,8 +22,9 @@ const {
   AddMember,
   DeleteMember,
   UpdateMember,
+  AddOriginMember,
 } = require("./severModules/family/memberActions");
-const { CreateFamily } = require("./severModules/family");
+const { CreateFamily, GetFamilyMembers } = require("./severModules/family");
 
 const app = express();
 
@@ -115,10 +116,23 @@ app.post("/familyTree/enter", async (req, res) => {
   // res.status(200).send({ message: "Enter!!" });
 });
 
+app.get("/familyTree/getDetails", async (req, res) => {
+  GetFamilyMembers(req, res);
+});
+
 app.post("/familyTree/add", async (req, res) => {
   console.log(req.body);
   try {
     await AddMember(req, res);
+  } catch (error) {
+    console.log("🚀 ~ file: server.js:111 ~ app.post ~ error", error);
+    res.status(400).send({ message: "Error!!" });
+  }
+});
+app.post("/familyTree/add/origin", async (req, res) => {
+  console.log(req.body);
+  try {
+    await AddOriginMember(req, res);
   } catch (error) {
     console.log("🚀 ~ file: server.js:111 ~ app.post ~ error", error);
     res.status(400).send({ message: "Error!!" });
