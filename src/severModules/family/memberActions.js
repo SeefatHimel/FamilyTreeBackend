@@ -248,7 +248,7 @@ async function UpdateMember(req, res) {
   let tmpMem = await Member.where("id").equals(data.id).clone();
   const rMember = tmpMem[0];
   const sameName = await Member.where("name").equals(data.name).clone();
-  if (sameName && sameName[0]) {
+  if (sameName && sameName[0].id !== data.id) {
     console.log("sameName", sameName);
     res.status(401).send({
       message: "Name Already used.",
