@@ -59,12 +59,12 @@ async function UploadToGDrive(image) {
     });
 }
 
-const searchDrive = async () => {
+const GetGDrivePictures = async () => {
   const folder = await googleDriveService.searchFolder("Picture");
-  console.log("🚀 ~ file: index.js:58 ~ searchDrive ~ folder", folder);
+  console.log("🚀 ~ file: index.js:58 ~ GetGDrivePictures ~ folder", folder);
   //  googleDriveService.files.list
   // console.log(
-  //   "🚀 ~ file: index.js:61 ~ searchDrive ~  googleDriveService.files.list",
+  //   "🚀 ~ file: index.js:61 ~ GetGDrivePictures ~  googleDriveService.files.list",
   //   googleDriveService?.driveClient?.files
   // );
   const drive = googleDriveService?.driveClient;
@@ -147,4 +147,4 @@ const searchDrive = async () => {
   // This will print out the names and web view links of the image files in your Google Drive. You can use the web view link as the URL to access the image in a web browser.
 };
 
-module.exports = { UploadToGDrive, searchDrive };
+module.exports = { UploadToGDrive, GetGDrivePictures };
