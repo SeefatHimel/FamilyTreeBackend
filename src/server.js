@@ -30,6 +30,7 @@ const {
   upload,
   GetImage,
 } = require("./severModules/imageUpload/imageUpload.action");
+const { UploadToGDrive, searchDrive } = require("./severModules/gdrive");
 
 const app = express();
 
@@ -44,7 +45,7 @@ mongoose.connect(
   }
 );
 // __dirname
-console.log("🚀 ~ file: server.js:47 ~ __dirname", __dirname)
+console.log("🚀 ~ file: server.js:47 ~ __dirname", __dirname);
 const corsOptions = {
   origin: true, //included origin as true
 
@@ -171,7 +172,12 @@ app.post("/upload", upload.single("image"), async (req, res) => {
 app.get("/download", async (req, res) => {
   await GetImage(req, res);
 });
+app.get("/files", async (req, res) => {
+  await searchDrive();
+});
 
 app.listen(3000, () => {
+  // UploadToGDrive();
+  searchDrive();
   console.log("Server running");
 });
