@@ -244,11 +244,17 @@ async function DeleteMember(req, res) {
 
 async function UpdateMember(req, res) {
   const { familyId, data } = req.body;
+  console.log(
+    "🚀 ~ file: memberActions.js:247 ~ UpdateMember ~ familyId, data",
+    familyId,
+    data
+  );
   const Member = require("../../models/familyMember")(familyId);
   let tmpMem = await Member.where("id").equals(data.id).clone();
   const rMember = tmpMem[0];
   const sameName = await Member.where("name").equals(data.name).clone();
-  if (sameName && sameName[0].id !== data.id) {
+  console.log("Check 1");
+  if (sameName[0] && sameName[0]?.id !== data.id) {
     console.log("sameName", sameName);
     res.status(401).send({
       message: "Name Already used.",
