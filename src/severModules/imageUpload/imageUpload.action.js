@@ -1,5 +1,6 @@
 const multer = require("multer");
 const imageUpload = require("../../models/imageUpload");
+const { UploadToGDrive } = require("../gdrive");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -27,9 +28,14 @@ const UploadImage = async (req, res) => {
     name: filename,
     path: path,
   });
-  await image.save();
-
-  res.send("Image uploaded");
+  try {
+    await image.save();
+    console.log("Saved in backend");
+    await UploadToGDrive(image);
+    res.send("Image uploaded");
+  } catch (error) {
+    res.status(400).send({ message: "Image upload failed" });
+  }
 };
 
 const GetImage = async (req, res) => {
