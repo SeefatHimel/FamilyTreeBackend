@@ -1,5 +1,6 @@
 const FamilyList = require("../../models/familyList");
 const { v4: uuidv4 } = require("uuid");
+const { DownloadImageFromUrl } = require("../../services/fileDownloadFromUrl");
 
 async function CreateFamily(req, res) {
   const data = req.body;
@@ -138,4 +139,54 @@ async function GetFamily(req, res) {
   }
 }
 
-module.exports = { CreateFamily, GetFamilyMembers };
+async function MakeImgLinkImage(req, res) {
+  const familyId = req.query.familyId ? req.query.familyId : req.body.familyId;
+
+  const fDetails = await FamilyList.where("id").equals(familyId);
+  const familyName = fDetails[0].name;
+
+  if (familyName) {
+    try {
+      const Members = require("../../models/familyMember")(familyId);
+      const members = await Members.find();
+
+      members.forEach(async (member) => {
+        const nMember = member;
+
+        try {
+          await DownloadImageFromUrl(member);
+
+          // Members.findByIdAndUpdate(
+          //   nMember._id,
+          //   nMember,
+          //   function (err, updatedData) {
+          //     if (err) {
+          //       console.log(err);
+          //     } else {
+          //       console.log("Member Updated ", updatedData);
+          //       res.status(201).send({
+          //         message: "Member Updated successfully.",
+          //       });
+          //       //res.redirect or res.send whatever you want to do
+          //     }
+          //   }
+          // ).clone;
+        } catch (error) {
+          console.log(error);
+          res.status(400).send({
+            message: "Failed to Update Member.",
+          });
+        }
+      });
+    } catch (error) {
+      console.log("GetFamilyMembers Error ", error);
+      res.status(400).send({
+        message: "Failed to Acquire Family Details",
+      });
+    }
+  } else
+    res.status(404).send({
+      message: "Family Not Found",
+    });
+}
+module.exports = { CreateFamily, GetFamilyMembers, MakeImgLinkImage };

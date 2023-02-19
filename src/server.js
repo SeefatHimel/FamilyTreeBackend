@@ -24,13 +24,17 @@ const {
   UpdateMember,
   AddOriginMember,
 } = require("./severModules/family/memberActions");
-const { CreateFamily, GetFamilyMembers } = require("./severModules/family");
+const {
+  CreateFamily,
+  GetFamilyMembers,
+  MakeImgLinkImage,
+} = require("./severModules/family");
 const {
   UploadImage,
   upload,
   GetImage,
 } = require("./severModules/imageUpload/imageUpload.action");
-const { UploadToGDrive, searchDrive } = require("./severModules/gdrive");
+const { UploadToGDrive, GetGDrivePictures } = require("./severModules/gdrive");
 
 const app = express();
 
@@ -125,6 +129,7 @@ app.post("/familyTree/enter", async (req, res) => {
 
 app.get("/familyTree/getDetails", async (req, res) => {
   GetFamilyMembers(req, res);
+  // MakeImgLinkImage(req, res);
 });
 
 app.post("/familyTree/add", async (req, res) => {
@@ -173,11 +178,11 @@ app.get("/download", async (req, res) => {
   await GetImage(req, res);
 });
 app.get("/files", async (req, res) => {
-  await searchDrive();
+  await GetGDrivePictures();
 });
 
 app.listen(3000, () => {
   // UploadToGDrive();
-  searchDrive();
+  // GetGDrivePictures();
   console.log("Server running");
 });
