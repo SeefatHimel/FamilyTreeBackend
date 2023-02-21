@@ -1,6 +1,8 @@
 const { v4: uuidv4 } = require("uuid");
+const { CheckGDrivePictures } = require("../gdrive");
 async function AddMember(req, res) {
-  const { familyId, data, memId } = req.body;
+  const formData = JSON.parse(req.body.data);
+  const { familyId, data, memId } = formData;
   const Members = require("../../models/familyMember")(familyId);
   let tmpMem = await Members.where("id").equals(memId).clone();
 
@@ -49,10 +51,12 @@ async function AddMember(req, res) {
           }
         }
       ).clone;
+      const file = req.file;
       const member = await Members.create({
         id: newMemberId,
         name: data.name,
-        imgLink: data.imgLink,
+        imgLink: data.imgLink ? data.imgLink : null,
+        imgPath: file?.path ? file.path : null,
         gender: data.gender,
         parents: parents,
         children: children,
@@ -156,6 +160,14 @@ async function DeleteMember(req, res) {
       message: "Was Already Deleted.",
     });
   } else {
+    if (member.imgPath) {
+      const imgPath = member.imgPath?.slice(8);
+      console.log(
+        "🚀 ~ file: memberActions.js:165 ~ DeleteMember ~ imgPath:",
+        imgPath
+      );
+      await CheckGDrivePictures(member.imgPath?.slice(8));
+    }
     console.log(
       "🚀 ~ file: addMember.js:101 ~ DeleteMember ~ childDeleted",
       childDeleted

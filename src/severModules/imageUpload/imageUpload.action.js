@@ -1,13 +1,28 @@
 const multer = require("multer");
 const imageUpload = require("../../models/imageUpload");
 const { UploadToGDrive } = require("../gdrive");
-
+const path = require("path");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    console.log(
+      "🚀 ~ file: imageUpload.action.js:10 ~ req:",
+      req.body.data,
+      req.files,
+      file
+    );
+    const formData = JSON.parse(req.body.data);
+    console.log(
+      "🚀 🚀🚀🚀~ file: imageUpload.action.js:17 ~ formData:",
+      formData
+    );
+
+    const extension = path.extname(file.originalname);
+    // console.log("🚀 ~ file: imageUpload.action.js:11 ~ formData:", formData);
+    cb(null, formData.memId + "_" + formData.data.name + extension);
+    // cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
@@ -17,6 +32,8 @@ const Image = imageUpload;
 
 const UploadImage = async (req, res) => {
   const { filename, path } = req.file;
+  // const formData = JSON.parse(req.body.data);
+  // const additionalData = formData.data;
   console.log(
     "🚀 ~ file: imageUpload.action.js:19 ~ UploadImage ~ filename, path",
     filename,
@@ -32,9 +49,11 @@ const UploadImage = async (req, res) => {
     await image.save();
     console.log("Saved in backend");
     await UploadToGDrive(image);
-    res.send("Image uploaded");
+    console.log("Image uploaded");
+    // res.send("Image uploaded");
   } catch (error) {
-    res.status(400).send({ message: "Image upload failed" });
+    console.log("Image upload failed");
+    // res.status(400).send({ message: "Image upload failed" });
   }
 };
 
