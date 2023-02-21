@@ -4,7 +4,7 @@ const {
   GetJwtAccessToken,
   AuthenticateJwtAccessToken,
 } = require("./services/tokenService");
-
+const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const express = require("express");
@@ -34,7 +34,11 @@ const {
   upload,
   GetImage,
 } = require("./severModules/imageUpload/imageUpload.action");
-const { UploadToGDrive, GetGDrivePictures } = require("./severModules/gdrive");
+const {
+  UploadToGDrive,
+  GetGDrivePictures,
+  CheckGDrivePictures,
+} = require("./severModules/gdrive");
 
 const app = express();
 
@@ -58,7 +62,9 @@ const corsOptions = {
 app.use("/uploads", express.static("uploads"));
 app.use(cors(corsOptions));
 app.use(express.json());
-
+// Parse incoming request bodies
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.send({ hello: "hello" });
 });
@@ -132,10 +138,22 @@ app.get("/familyTree/getDetails", async (req, res) => {
   // MakeImgLinkImage(req, res);
 });
 
-app.post("/familyTree/add", async (req, res) => {
-  console.log(req.body);
+app.post("/familyTree/add", upload.single("image"), async (req, res) => {
+  console.log("/familyTree/add", req.body, typeof req.body.data);
+  console.log("req.file", req.file);
+
+  const formData = JSON.parse(req.body.data);
+  console.log("🚀 ~ file: server.js:140 ~ app.post ~ formData:", formData);
+  // const additionalData = formData.data;
+  // console.log(
+  //   "🚀 ~ file: server.js:141 ~ app.post ~ additionalData:",
+  //   additionalData
+  // );
   try {
+    await CheckGDrivePictures(req.file.filename);
+    await UploadImage(req, res);
     await AddMember(req, res);
+    res.status(400).send();
   } catch (error) {
     console.log("🚀 ~ file: server.js:134 ~ app.post ~ error", error);
     res.status(400).send({ message: "Error!!" });

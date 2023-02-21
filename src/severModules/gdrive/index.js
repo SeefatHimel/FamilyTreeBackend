@@ -59,6 +59,56 @@ async function UploadToGDrive(image) {
     });
 }
 
+async function DeleteFileGDrive(fileId) {
+  const drive = googleDriveService?.driveClient;
+  try {
+    await drive.files.delete({
+      fileId: fileId,
+    });
+    console.log("File deleted successfully");
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+const CheckGDrivePictures = async (filename) => {
+  const folder = await googleDriveService.searchFolder("Picture");
+  console.log("🚀 ~ file: index.js:58 ~ GetGDrivePictures ~ folder", folder);
+
+  const drive = googleDriveService?.driveClient;
+  drive.files.list(
+    {
+      q: `'${folder.id}' in parents and (mimeType="image/jpeg" or mimeType="image/png")`,
+      fields: "files(name, id , mimeType)",
+    },
+    (err, res) => {
+      if (err) {
+        console.error("Error retrieving files:", err);
+        return;
+      }
+      const files = res.data.files;
+      if (files.length) {
+        console.log("Checking files:");
+        files.forEach(async (file) => {
+          console.log(`->> ${file.name}  ${filename} `);
+          if (file.name === filename) {
+            console.log("Similar File Found");
+            try {
+              await DeleteFileGDrive(file.id);
+              console.log("Similar File Deleted");
+            } catch (error) {
+              console.log("Failed to Delete File ");
+            }
+          }
+        });
+      } else {
+        console.log("No similar files found.");
+      }
+    }
+  );
+  // This will print out the names and web view links of the image files in your Google Drive. You can use the web view link as the URL to access the image in a web browser.
+};
+
 const GetGDrivePictures = async () => {
   const folder = await googleDriveService.searchFolder("Picture");
   console.log("🚀 ~ file: index.js:58 ~ GetGDrivePictures ~ folder", folder);
@@ -147,4 +197,9 @@ const GetGDrivePictures = async () => {
   // This will print out the names and web view links of the image files in your Google Drive. You can use the web view link as the URL to access the image in a web browser.
 };
 
-module.exports = { UploadToGDrive, GetGDrivePictures };
+module.exports = {
+  UploadToGDrive,
+  GetGDrivePictures,
+  DeleteFileGDrive,
+  CheckGDrivePictures,
+};

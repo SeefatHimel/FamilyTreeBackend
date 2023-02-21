@@ -61,10 +61,10 @@ async function GetFamilyMembers(req, res) {
     try {
       const Members = require("../../models/familyMember")(familyId);
       const members = await Members.find();
-      console.log(
-        "🚀 ~ file: index.js:56 ~ GetFamilyMembers ~ members",
-        members
-      );
+      // console.log(
+      //   "🚀 ~ file: index.js:56 ~ GetFamilyMembers ~ members",
+      //   members
+      // );
       res.send({
         id: familyId,
         details: {
