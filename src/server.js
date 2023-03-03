@@ -159,9 +159,14 @@ app.post("/familyTree/add", upload.single("image"), async (req, res) => {
     res.status(400).send({ message: "Error!!" });
   }
 });
-app.post("/familyTree/add/origin", async (req, res) => {
+app.post("/familyTree/add/origin", upload.single("image"), async (req, res) => {
   console.log(req.body);
+  console.log("req.file", req.file);
+  const formData = JSON.parse(req.body.data);
+  console.log("🚀 ~ file: server.js:140 ~ app.post ~ formData:", formData);
   try {
+    await CheckGDrivePictures(req.file.filename);
+    await UploadImage(req, res);
     await AddOriginMember(req, res);
   } catch (error) {
     console.log("🚀 ~ file: server.js:143 ~ app.post ~ error", error);
@@ -169,8 +174,11 @@ app.post("/familyTree/add/origin", async (req, res) => {
   }
 });
 
-app.put("/familyTree/update", async (req, res) => {
+app.put("/familyTree/update", upload.single("image"), async (req, res) => {
   console.log(req.body);
+  console.log("req.file", req.file);
+
+  const formData = JSON.parse(req.body.data);
   try {
     await UpdateMember(req, res);
   } catch (error) {
@@ -201,6 +209,6 @@ app.get("/files", async (req, res) => {
 
 app.listen(3000, () => {
   // UploadToGDrive();
-  // GetGDrivePictures();
+  GetGDrivePictures();
   console.log("Server running");
 });

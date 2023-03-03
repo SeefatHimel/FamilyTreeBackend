@@ -76,9 +76,14 @@ async function AddMember(req, res) {
   }
 }
 async function AddOriginMember(req, res) {
-  const { familyId, data } = req.body;
+  const formData = JSON.parse(req.body.data);
+  const { familyId, data, memId } = formData;
   const Members = require("../../models/familyMember")(familyId);
 
+  console.log(
+    "🚀 ~ file: memberActions.js:83 ~ AddOriginMember ~ req.file:",
+    req.file
+  );
   const sameName = await Members.where("name").equals(data.name).clone();
   if (sameName && sameName[0]) {
     console.log("sameName", sameName);
@@ -109,6 +114,7 @@ async function AddOriginMember(req, res) {
         id: newMemberId,
         name: data.name,
         imgLink: data.imgLink,
+        imgPath: req.file.path ? req.file.path : null,
         gender: data.gender,
         parents: parents,
         children: children,
@@ -255,7 +261,8 @@ async function DeleteMember(req, res) {
 }
 
 async function UpdateMember(req, res) {
-  const { familyId, data } = req.body;
+  const formData = JSON.parse(req.body.data);
+  const { familyId, data, memId } = formData;
   console.log(
     "🚀 ~ file: memberActions.js:247 ~ UpdateMember ~ familyId, data",
     familyId,
@@ -264,6 +271,11 @@ async function UpdateMember(req, res) {
   const Members = require("../../models/familyMember")(familyId);
   let tmpMem = await Members.where("id").equals(data.id).clone();
   const rMember = tmpMem[0];
+  console.log(
+    "🚀 ~ file: memberActions.js:273 ~ UpdateMember ~ rMember:",
+    rMember,
+    data
+  );
   const sameName = await Members.where("name").equals(data.name).clone();
   console.log("Check 1");
   if (sameName[0] && sameName[0]?.id !== data.id) {
@@ -274,7 +286,16 @@ async function UpdateMember(req, res) {
   } else {
     try {
       rMember.name = data.name;
-      rMember.imgLink = data.imgLink;
+      if (data.imgLink) {
+        rMember.imgLink = data.imgLink;
+        rMember.imgPath &&
+          (await CheckGDrivePictures(rMember.imgPath.slice(8)));
+        rMember.imgPath = null;
+      }
+      if (data.imgPath) {
+        rMember.imgPath = data.imgPath;
+        rMember.imgLink = null;
+      }
 
       Members.findByIdAndUpdate(
         rMember._id,
