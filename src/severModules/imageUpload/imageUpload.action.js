@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 
     const extension = path.extname(file.originalname);
     // console.log("🚀 ~ file: imageUpload.action.js:11 ~ formData:", formData);
-    cb(null, formData.memId + "_" + formData.data.name + extension);
+    cb(null, formData.familyId + "_" + formData.data.name + extension);
     // cb(null, Date.now() + "-" + file.originalname);
   },
 });
