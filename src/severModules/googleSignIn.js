@@ -146,7 +146,7 @@ async function GetGoogleLoginLink(req, res) {
   oAuth2Client = new OAuth2Client(
     keys.web.client_id,
     keys.web.client_secret,
-    redirect_uri
+    redirect_uri + keys.web.redirect_uri_ext
   );
   const authorizeUrl = getLink();
   res.send(authorizeUrl);
