@@ -209,6 +209,6 @@ app.get("/files", async (req, res) => {
 
 app.listen(3000, () => {
   // UploadToGDrive();
-  GetGDrivePictures();
+  // GetGDrivePictures();
   console.log("Server running");
 });
