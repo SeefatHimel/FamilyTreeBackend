@@ -1,8 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { CheckGDrivePictures } = require("../gdrive");
 async function AddMember(req, res) {
-  const formData = JSON.parse(req.body.data);
-  const { familyId, data, memId } = formData;
+  const { familyId, data, memId } = req.body;
   const Members = require("../../models/familyMember")(familyId);
   let tmpMem = await Members.where("id").equals(memId).clone();
 
@@ -56,7 +55,6 @@ async function AddMember(req, res) {
         id: newMemberId,
         name: data.name,
         imgLink: data.imgLink ? data.imgLink : null,
-        imgPath: file?.path ? file.path : null,
         gender: data.gender,
         parents: parents,
         children: children,
@@ -76,8 +74,13 @@ async function AddMember(req, res) {
   }
 }
 async function AddOriginMember(req, res) {
-  const formData = JSON.parse(req.body.data);
-  const { familyId, data, memId } = formData;
+  const { familyId, data, memId } = req.body;
+  console.log(
+    "🚀 ~ file: memberActions.js:79 ~ AddOriginMember ~ memId:",
+    familyId,
+    data,
+    memId
+  );
   const Members = require("../../models/familyMember")(familyId);
 
   console.log(
@@ -114,7 +117,6 @@ async function AddOriginMember(req, res) {
         id: newMemberId,
         name: data.name,
         imgLink: data.imgLink,
-        imgPath: req.file.path ? req.file.path : null,
         gender: data.gender,
         parents: parents,
         children: children,
@@ -166,14 +168,6 @@ async function DeleteMember(req, res) {
       message: "Was Already Deleted.",
     });
   } else {
-    if (member.imgPath) {
-      const imgPath = member.imgPath?.slice(8);
-      console.log(
-        "🚀 ~ file: memberActions.js:165 ~ DeleteMember ~ imgPath:",
-        imgPath
-      );
-      await CheckGDrivePictures(member.imgPath?.slice(8));
-    }
     console.log(
       "🚀 ~ file: addMember.js:101 ~ DeleteMember ~ childDeleted",
       childDeleted
@@ -261,8 +255,7 @@ async function DeleteMember(req, res) {
 }
 
 async function UpdateMember(req, res) {
-  const formData = JSON.parse(req.body.data);
-  const { familyId, data, memId } = formData;
+  const { familyId, data, memId } = req.body;
   console.log(
     "🚀 ~ file: memberActions.js:247 ~ UpdateMember ~ familyId, data",
     familyId,
@@ -288,13 +281,6 @@ async function UpdateMember(req, res) {
       rMember.name = data.name;
       if (data.imgLink) {
         rMember.imgLink = data.imgLink;
-        rMember.imgPath &&
-          (await CheckGDrivePictures(rMember.imgPath.slice(8)));
-        rMember.imgPath = null;
-      }
-      if (data.imgPath) {
-        rMember.imgPath = data.imgPath;
-        rMember.imgLink = null;
       }
 
       Members.findByIdAndUpdate(
