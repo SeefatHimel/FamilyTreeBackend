@@ -138,20 +138,10 @@ app.get("/familyTree/getDetails", async (req, res) => {
   // MakeImgLinkImage(req, res);
 });
 
-app.post("/familyTree/add", upload.single("image"), async (req, res) => {
+app.post("/familyTree/add",  async (req, res) => {
   console.log("/familyTree/add", req.body, typeof req.body.data);
-  console.log("req.file", req.file);
 
-  const formData = JSON.parse(req.body.data);
-  console.log("🚀 ~ file: server.js:140 ~ app.post ~ formData:", formData);
-  // const additionalData = formData.data;
-  // console.log(
-  //   "🚀 ~ file: server.js:141 ~ app.post ~ additionalData:",
-  //   additionalData
-  // );
   try {
-    await CheckGDrivePictures(req.file.filename);
-    await UploadImage(req, res);
     await AddMember(req, res);
     res.status(400).send();
   } catch (error) {
@@ -159,14 +149,9 @@ app.post("/familyTree/add", upload.single("image"), async (req, res) => {
     res.status(400).send({ message: "Error!!" });
   }
 });
-app.post("/familyTree/add/origin", upload.single("image"), async (req, res) => {
+app.post("/familyTree/add/origin", async (req, res) => {
   console.log(req.body);
-  console.log("req.file", req.file);
-  const formData = JSON.parse(req.body.data);
-  console.log("🚀 ~ file: server.js:140 ~ app.post ~ formData:", formData);
   try {
-    await CheckGDrivePictures(req.file.filename);
-    await UploadImage(req, res);
     await AddOriginMember(req, res);
   } catch (error) {
     console.log("🚀 ~ file: server.js:143 ~ app.post ~ error", error);
@@ -174,11 +159,8 @@ app.post("/familyTree/add/origin", upload.single("image"), async (req, res) => {
   }
 });
 
-app.put("/familyTree/update", upload.single("image"), async (req, res) => {
+app.put("/familyTree/update", async (req, res) => {
   console.log(req.body);
-  console.log("req.file", req.file);
-
-  const formData = JSON.parse(req.body.data);
   try {
     await UpdateMember(req, res);
   } catch (error) {
