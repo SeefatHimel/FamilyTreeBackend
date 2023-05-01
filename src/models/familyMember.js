@@ -3,7 +3,6 @@ const memberSchema = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   imgLink: { type: String },
-  imgPath: { type: String },
   createdAt: { type: Date, immutable: true, default: () => Date.now() },
   updatedAt: { type: Date, default: () => Date.now() },
   gender: { type: String, required: true },
