@@ -1,13 +1,13 @@
 const { OAuth2Client } = require("google-auth-library");
-const keys = require("../data/oauth2.keys.json");
+const keys = require("../../data/oauth2.keys.json");
 const jwt = require("jsonwebtoken");
 const { google } = require("googleapis");
-const { SaveToDB } = require("../services/mongoDBService");
+const { SaveToDB } = require("../../services/mongoDBService");
 const {
   GenerateJwtAccessToken,
   SaveJwtRefreshToken,
-} = require("../services/tokenService");
-const { GetValidUserData } = require("../services/userData");
+} = require("../../services/tokenService");
+const { GetValidUserData } = require("../../services/userData");
 
 let oAuth2Client;
 
