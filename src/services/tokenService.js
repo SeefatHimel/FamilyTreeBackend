@@ -15,7 +15,7 @@ async function GenerateJwtAccessToken({ id, name, email }) {
       email,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "60s" }
+    { expiresIn: "6000s" }
   );
 }
 async function SaveJwtRefreshToken(email, refresh_token) {

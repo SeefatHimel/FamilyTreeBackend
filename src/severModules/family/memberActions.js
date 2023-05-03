@@ -1,5 +1,4 @@
 const { v4: uuidv4 } = require("uuid");
-const { CheckGDrivePictures } = require("../gdrive");
 async function AddMember(req, res) {
   const { familyId, data, memId } = req.body;
   const Members = require("../../models/familyMember")(familyId);
@@ -50,7 +49,6 @@ async function AddMember(req, res) {
           }
         }
       ).clone;
-      const file = req.file;
       const member = await Members.create({
         id: newMemberId,
         name: data.name,
@@ -82,11 +80,6 @@ async function AddOriginMember(req, res) {
     memId
   );
   const Members = require("../../models/familyMember")(familyId);
-
-  console.log(
-    "🚀 ~ file: memberActions.js:83 ~ AddOriginMember ~ req.file:",
-    req.file
-  );
   const sameName = await Members.where("name").equals(data.name).clone();
   if (sameName && sameName[0]) {
     console.log("sameName", sameName);
