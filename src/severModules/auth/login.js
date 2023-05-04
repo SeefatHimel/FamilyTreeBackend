@@ -1,12 +1,12 @@
-const User = require("../models/user");
+const User = require("../../models/user");
 
 const {
   GenerateJwtAccessToken,
   SaveJwtRefreshToken,
-} = require("../services/tokenService");
-const { GetDataFromDBbyEmail } = require("../services/mongoDBService");
+} = require("../../services/tokenService");
+const { GetDataFromDBbyEmail } = require("../../services/mongoDBService");
 const jwt = require("jsonwebtoken");
-const { GetValidUserData } = require("../services/userData");
+const { GetValidUserData } = require("../../services/userData");
 require("dotenv").config();
 
 async function signIn(req, res) {

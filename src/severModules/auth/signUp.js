@@ -1,5 +1,5 @@
-const User = require("../models/user");
-const { SaveUserToDB } = require("../services/mongoDBService");
+const User = require("../../models/user");
+const { SaveUserToDB } = require("../../services/mongoDBService");
 
 async function RegisterUser(userReq, res) {
   console.log("registerUser > ", userReq);

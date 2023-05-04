@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { signIn } = require("./severModules/login");
+const { signIn } = require("./severModules/auth/login");
 const {
   GetJwtAccessToken,
   AuthenticateJwtAccessToken,
@@ -16,8 +16,8 @@ const { GetUserInfo } = require("./services/mongoDBService");
 const {
   GoogleLogin,
   GetGoogleLoginLink,
-} = require("./severModules/googleSignIn");
-const { CheckEmailValidity, RegisterUser } = require("./severModules/signUp");
+} = require("./severModules/auth/googleSignIn");
+const { CheckEmailValidity, RegisterUser } = require("./severModules/auth/signUp");
 const {
   AddMember,
   DeleteMember,
