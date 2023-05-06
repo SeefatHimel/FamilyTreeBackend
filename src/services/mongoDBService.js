@@ -1,9 +1,11 @@
-const User = require("../models/user");
-const { v4: uuidv4 } = require("uuid");
-const jwt = require("jsonwebtoken");
+import user from "../models/user";
+
+// const User = require("../models/user").default;
+import { v4 as uuidv4 } from "uuid";
+import jwt from "jsonwebtoken";
 
 async function SaveToDB(name, email) {
-  const oldUser = await User.where("email").equals(email);
+  const oldUser = await user.where("email").equals(email);
   console.log(oldUser[0]);
   if (oldUser[0]) {
     console.log("User already Exists");
@@ -29,7 +31,7 @@ async function GetDataFromDBbyEmail(email) {
     const userData = await User.where("email").equals(email);
     console.log(
       "🚀 ~ file: mongoDBService.js:29 ~ GetDataFromDBbyEmail ~ userData",
-      userData,
+      userData
     );
     return userData;
   } catch (error) {
@@ -86,8 +88,7 @@ async function getLoggedInUser(token) {
   return tmp;
 }
 
-async function GetUserInfo(req,res)
-{
+async function GetUserInfo(req, res) {
   const authToken = req.headers["authorization"].split(" ")[1];
   console.log("/getData", authToken);
 
@@ -114,4 +115,4 @@ async function GetUserInfo(req,res)
     res.status(200).send(data);
   }
 }
-module.exports = { SaveToDB, SaveUserToDB, GetDataFromDBbyEmail  ,GetUserInfo};
+export { SaveToDB, SaveUserToDB, GetDataFromDBbyEmail, GetUserInfo };

@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const savedFamiliesSchema = new mongoose.Schema({
+const savedFamiliesSchema = new Schema({
   userId: { type: String, required: true },
   families: [family],
 });
@@ -9,4 +9,4 @@ const family = {
   name: { type: String, required: true },
 };
 
-module.exports = mongoose.model("SavedFamilies", savedFamiliesSchema);
+export default model("SavedFamilies", savedFamiliesSchema);

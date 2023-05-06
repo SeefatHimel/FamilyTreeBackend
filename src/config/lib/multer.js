@@ -1,10 +1,10 @@
-const path = require("path");
-const multer = require("multer");
+import { extname } from "path";
+import multer, { diskStorage } from "multer";
 
-module.exports = multer({
-  storage: multer.diskStorage({}),
+export default multer({
+  storage: diskStorage({}),
   fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
+    const ext = extname(file.originalname);
     if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
       cb(new Error("Only pictures are allowed."), false);
       return;

@@ -1,6 +1,6 @@
-const FamilyList = require("../../models/familyList");
-const { v4: uuidv4 } = require("uuid");
-
+import FamilyList from "../../models/familyList";
+import { v4 as uuidv4 } from "uuid";
+import FamilyMember from "../../models/familyMember";
 async function CreateFamily(req, res) {
   const data = req.body;
   console.log("🚀 ~ file: index.js:6 ~ CreateFamily ~ data", data);
@@ -58,7 +58,7 @@ async function GetFamilyMembers(req, res) {
   );
   if (familyName) {
     try {
-      const Members = require("../../models/familyMember")(familyId);
+      const Members = new FamilyMember(familyId);
       const members = await Members.find();
       // console.log(
       //   "🚀 ~ file: index.js:56 ~ GetFamilyMembers ~ members",
@@ -105,7 +105,7 @@ async function GetFamily(req, res) {
         } else {
           console.log("family > ", family);
           if (family.validPassword(req.body.password)) {
-            const Members = require("../../models/familyMember")(family.id);
+            const Members = new FamilyMember(family.id);
             const members = await Members.find();
 
             res.cookie("activeFamilyID", family?.id, {
@@ -137,5 +137,4 @@ async function GetFamily(req, res) {
     });
   }
 }
-
-module.exports = { CreateFamily, GetFamilyMembers };
+export { CreateFamily, GetFamilyMembers };
