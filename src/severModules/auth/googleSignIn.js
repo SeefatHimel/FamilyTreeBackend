@@ -1,13 +1,13 @@
-const { OAuth2Client } = require("google-auth-library");
-const keys = require("../../data/oauth2.keys.json");
-const jwt = require("jsonwebtoken");
-const { google } = require("googleapis");
-const { SaveToDB } = require("../../services/mongoDBService");
-const {
+import { OAuth2Client } from "google-auth-library";
+import keys from "../../data/oauth2.keys.json";
+import jwt from "jsonwebtoken";
+import { google } from "googleapis";
+import { SaveToDB } from "../../services/mongoDBService";
+import {
   GenerateJwtAccessToken,
   SaveJwtRefreshToken,
-} = require("../../services/tokenService");
-const { GetValidUserData } = require("../../services/userData");
+} from "../../services/tokenService";
+import { GetValidUserData } from "../../services/userData";
 
 let oAuth2Client;
 
@@ -152,4 +152,4 @@ async function GetGoogleLoginLink(req, res) {
   res.send(authorizeUrl);
 }
 
-module.exports = { GoogleLogin, GetGoogleLoginLink };
+export { GoogleLogin, GetGoogleLoginLink };

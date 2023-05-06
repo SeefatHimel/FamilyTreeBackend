@@ -11,4 +11,4 @@ function GetValidUserData(user) {
   };
 }
 
-module.exports = { GetValidUserData };
+export { GetValidUserData };

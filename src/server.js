@@ -1,34 +1,40 @@
-const mongoose = require("mongoose");
-const { signIn } = require("./severModules/auth/login");
-const {
+import { connect } from "mongoose";
+import { signIn } from "./severModules/auth/login";
+import {
   GetJwtAccessToken,
   AuthenticateJwtAccessToken,
-} = require("./services/tokenService");
-const bodyParser = require("body-parser");
-require("dotenv").config();
+} from "./services/tokenService";
 
-const express = require("express");
-const cors = require("cors");
+import pkg from "body-parser";
+const { json, urlencoded } = pkg;
 
-const UserTokens = require("./models/userTokens");
-const { GetUserInfo } = require("./services/mongoDBService");
+import dotenv from "dotenv";
+dotenv.config();
 
-const {
+import express, { json as _json } from "express";
+import cors from "cors";
+
+import userTokens from "./models/userTokens";
+import { GetUserInfo } from "./services/mongoDBService";
+
+import {
   GoogleLogin,
   GetGoogleLoginLink,
-} = require("./severModules/auth/googleSignIn");
-const { CheckEmailValidity, RegisterUser } = require("./severModules/auth/signUp");
-const {
+} from "./severModules/auth/googleSignIn";
+import { CheckEmailValidity, RegisterUser } from "./severModules/auth/signUp";
+
+import {
   AddMember,
   DeleteMember,
   UpdateMember,
   AddOriginMember,
-} = require("./severModules/family/memberActions");
-const { CreateFamily, GetFamilyMembers } = require("./severModules/family");
+} from "./severModules/family/memberActions";
+
+import { CreateFamily, GetFamilyMembers } from "./severModules/family";
 
 const app = express();
 
-mongoose.connect(
+connect(
   "mongodb+srv://himel:himel@cluster0.6uvuj.mongodb.net/familyTree",
   (err, result) => {
     if (err) {
@@ -38,19 +44,16 @@ mongoose.connect(
     }
   }
 );
-// __dirname
-console.log("🚀 ~ file: server.js:47 ~ __dirname", __dirname);
 const corsOptions = {
   origin: true, //included origin as true
 
   credentials: true, //included credentials as true
 };
-app.use("/uploads", express.static("uploads"));
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(_json());
 // Parse incoming request bodies
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.send({ hello: "hello" });
 });
@@ -100,10 +103,10 @@ app.post("/register_email", async (req, res) => {
 });
 
 app.post("/logout", async (req, res) => {
-  const tokens = await UserTokens.find().clone();
+  const tokens = await userTokens.find().clone();
   if (tokens[0]) {
     try {
-      await UserTokens.deleteMany({});
+      await userTokens.deleteMany({});
       console.log("Refresh Tokens Deleted");
       res.status(200).send({ message: "Logged out!!" });
     } catch (e) {

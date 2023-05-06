@@ -1,7 +1,8 @@
-const { v4: uuidv4 } = require("uuid");
+import { v4 as uuidv4 } from "uuid";
+import FamilyMember from "../../models/familyMember";
 async function AddMember(req, res) {
   const { familyId, data, memId } = req.body;
-  const Members = require("../../models/familyMember")(familyId);
+  const Members = new FamilyMember(familyId);
   let tmpMem = await Members.where("id").equals(memId).clone();
 
   if (data.relation === "Sibling") {
@@ -79,7 +80,7 @@ async function AddOriginMember(req, res) {
     data,
     memId
   );
-  const Members = require("../../models/familyMember")(familyId);
+  const Members = new FamilyMember(familyId);
   const sameName = await Members.where("name").equals(data.name).clone();
   if (sameName && sameName[0]) {
     console.log("sameName", sameName);
@@ -152,7 +153,7 @@ async function DeleteChildren(Members, id) {
 
 async function DeleteMember(req, res) {
   const { familyId, memId } = req.body;
-  const Members = require("../../models/familyMember")(familyId);
+  const Members = new FamilyMember(familyId);
   let tmpMem = await Members.where("id").equals(memId).clone();
   const member = tmpMem[0];
   let childDeleted = true;
@@ -254,7 +255,7 @@ async function UpdateMember(req, res) {
     familyId,
     data
   );
-  const Members = require("../../models/familyMember")(familyId);
+  const Members = new FamilyMember(familyId);
   let tmpMem = await Members.where("id").equals(data.id).clone();
   const rMember = tmpMem[0];
   console.log(
@@ -300,4 +301,4 @@ async function UpdateMember(req, res) {
   }
 }
 
-module.exports = { AddMember, AddOriginMember, DeleteMember, UpdateMember };
+export { AddMember, AddOriginMember, DeleteMember, UpdateMember };

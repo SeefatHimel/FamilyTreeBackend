@@ -1,6 +1,8 @@
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
-const UserTokens = require("../models/userTokens");
+import pkg from "jsonwebtoken";
+const { sign, verify } = pkg;
+import dotenv from "dotenv";
+import UserTokens from "../models/userTokens";
+dotenv.config();
 
 async function GenerateJwtAccessToken({ id, name, email }) {
   console.log("GenerateJwtAccessToken");
@@ -8,7 +10,7 @@ async function GenerateJwtAccessToken({ id, name, email }) {
     "process.env.ACCESS_TOKEN_SECRET ",
     process.env.ACCESS_TOKEN_SECRET
   );
-  return jwt.sign(
+  return sign(
     {
       id,
       name,
@@ -27,7 +29,7 @@ async function SaveJwtRefreshToken(email, refresh_token) {
     console.log("Token already Exists");
   } else {
     try {
-      newToken = await UserTokens.create({
+      const newToken = await UserTokens.create({
         email: email,
         refresh_token: refresh_token,
       });
@@ -51,29 +53,25 @@ async function GetJwtAccessToken(refreshToken, res) {
     return res.status(403).send({
       message: "Token already exists , Log in Again",
     });
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    async (err, user) => {
-      if (err)
-        return res.status(403).send({
-          message: "JWT verification Failed. Login Again",
-        });
-      const accessToken = await GenerateJwtAccessToken({
-        id: user?.id,
-        name: user?.name,
-        email: user?.email,
+  verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
+    if (err)
+      return res.status(403).send({
+        message: "JWT verification Failed. Login Again",
       });
-      console.log("new accessToken ", accessToken);
-      res
-        .cookie("accessToken", accessToken, {
-          secure: true,
-          sameSite: "strict",
-        })
-        .send({ accessToken: accessToken });
-      // res.send({ accessToken: accessToken });
-    }
-  );
+    const accessToken = await GenerateJwtAccessToken({
+      id: user?.id,
+      name: user?.name,
+      email: user?.email,
+    });
+    console.log("new accessToken ", accessToken);
+    res
+      .cookie("accessToken", accessToken, {
+        secure: true,
+        sameSite: "strict",
+      })
+      .send({ accessToken: accessToken });
+    // res.send({ accessToken: accessToken });
+  });
 }
 
 async function AuthenticateJwtAccessToken(req, res, next) {
@@ -88,7 +86,7 @@ async function AuthenticateJwtAccessToken(req, res, next) {
       message: "Token not found!",
     });
   } else {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
+    verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
       console.log("AccessToken data ", data);
       console.log("AccessToken err ", err);
       if (err) {
@@ -110,7 +108,7 @@ async function AuthenticateJwtAccessToken(req, res, next) {
   }
 }
 
-module.exports = {
+export {
   GenerateJwtAccessToken,
   SaveJwtRefreshToken,
   GetJwtAccessToken,

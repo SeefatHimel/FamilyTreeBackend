@@ -15,7 +15,7 @@ const LINKEDIN_EMAIL =
 
 const fetchJSON = (...args) => fetch(...args).then((r) => r.json());
 
-module.exports = {
+export {
   getValidatedWithGoogleUser: async (code, redirectUri) => {
     const { access_token } = await fetchJSON(GOOGLE_TOKEN, {
       method: "POST",
