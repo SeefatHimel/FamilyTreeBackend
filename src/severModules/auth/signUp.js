@@ -1,5 +1,5 @@
-const User = require("../models/user");
-const { SaveUserToDB } = require("../services/mongoDBService");
+import User from "../../models/user";
+import { SaveUserToDB } from "../../services/mongoDBService";
 
 async function RegisterUser(userReq, res) {
   console.log("registerUser > ", userReq);
@@ -28,4 +28,4 @@ async function CheckEmailValidity(req, res) {
   // res.send(validEmail.name || req.body.email);
 }
 
-module.exports = { RegisterUser, CheckEmailValidity };
+export { RegisterUser, CheckEmailValidity };

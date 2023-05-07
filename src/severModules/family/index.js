@@ -1,7 +1,6 @@
-const FamilyList = require("../../models/familyList");
-const { v4: uuidv4 } = require("uuid");
-const { DownloadImageFromUrl } = require("../../services/fileDownloadFromUrl");
-
+import FamilyList from "../../models/familyList";
+import { v4 as uuidv4 } from "uuid";
+import FamilyMember from "../../models/familyMember";
 async function CreateFamily(req, res) {
   const data = req.body;
   console.log("🚀 ~ file: index.js:6 ~ CreateFamily ~ data", data);
@@ -59,7 +58,7 @@ async function GetFamilyMembers(req, res) {
   );
   if (familyName) {
     try {
-      const Members = require("../../models/familyMember")(familyId);
+      const Members = new FamilyMember(familyId);
       const members = await Members.find();
       // console.log(
       //   "🚀 ~ file: index.js:56 ~ GetFamilyMembers ~ members",
@@ -106,7 +105,7 @@ async function GetFamily(req, res) {
         } else {
           console.log("family > ", family);
           if (family.validPassword(req.body.password)) {
-            const Members = require("../../models/familyMember")(family.id);
+            const Members = new FamilyMember(family.id);
             const members = await Members.find();
 
             res.cookie("activeFamilyID", family?.id, {
@@ -138,55 +137,4 @@ async function GetFamily(req, res) {
     });
   }
 }
-
-async function MakeImgLinkImage(req, res) {
-  const familyId = req.query.familyId ? req.query.familyId : req.body.familyId;
-
-  const fDetails = await FamilyList.where("id").equals(familyId);
-  const familyName = fDetails[0].name;
-
-  if (familyName) {
-    try {
-      const Members = require("../../models/familyMember")(familyId);
-      const members = await Members.find();
-
-      members.forEach(async (member) => {
-        const nMember = member;
-
-        try {
-          await DownloadImageFromUrl(member);
-
-          // Members.findByIdAndUpdate(
-          //   nMember._id,
-          //   nMember,
-          //   function (err, updatedData) {
-          //     if (err) {
-          //       console.log(err);
-          //     } else {
-          //       console.log("Member Updated ", updatedData);
-          //       res.status(201).send({
-          //         message: "Member Updated successfully.",
-          //       });
-          //       //res.redirect or res.send whatever you want to do
-          //     }
-          //   }
-          // ).clone;
-        } catch (error) {
-          console.log(error);
-          res.status(400).send({
-            message: "Failed to Update Member.",
-          });
-        }
-      });
-    } catch (error) {
-      console.log("GetFamilyMembers Error ", error);
-      res.status(400).send({
-        message: "Failed to Acquire Family Details",
-      });
-    }
-  } else
-    res.status(404).send({
-      message: "Family Not Found",
-    });
-}
-module.exports = { CreateFamily, GetFamilyMembers, MakeImgLinkImage };
+export { CreateFamily, GetFamilyMembers };

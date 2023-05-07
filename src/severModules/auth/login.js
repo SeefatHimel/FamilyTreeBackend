@@ -1,13 +1,14 @@
-const User = require("../models/user");
-
-const {
+import User from "../../models/user";
+import { GetDataFromDBbyEmail } from "../../services/mongoDBService";
+import {
   GenerateJwtAccessToken,
   SaveJwtRefreshToken,
-} = require("../services/tokenService");
-const { GetDataFromDBbyEmail } = require("../services/mongoDBService");
-const jwt = require("jsonwebtoken");
-const { GetValidUserData } = require("../services/userData");
-require("dotenv").config();
+} from "../../services/tokenService";
+import { GetValidUserData } from "../../services/userData";
+import jwt from "jsonwebtoken";
+
+import dotenv from "dotenv";
+dotenv.config();
 
 async function signIn(req, res) {
   console.log("email : ", req.body.email, " Pass : ", req.body.password);
@@ -103,4 +104,4 @@ async function signIn(req, res) {
 //   picture: string;
 //   locale: string;
 // };
-module.exports = { signIn };
+export { signIn };

@@ -1,5 +1,5 @@
-var mongoose = require("mongoose");
-const memberSchema = new mongoose.Schema({
+import { Schema, model } from "mongoose";
+const memberSchema = new Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   imgLink: { type: String },
@@ -11,8 +11,8 @@ const memberSchema = new mongoose.Schema({
   children: { type: Array, required: true },
 });
 function dynamicFamilyMemberSchema(prefix) {
-  return mongoose.model(prefix + ".members", memberSchema);
+  return model(prefix + ".members", memberSchema);
 }
 
 //no we export dynamicSchema function
-module.exports = dynamicFamilyMemberSchema;
+export default dynamicFamilyMemberSchema;
