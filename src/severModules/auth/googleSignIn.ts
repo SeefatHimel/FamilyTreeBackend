@@ -9,9 +9,9 @@ import {
 } from "../../services/tokenService";
 import { GetValidUserData } from "../../services/userData";
 
-let oAuth2Client;
+let oAuth2Client: any;
 
-async function GoogleLogin(code, res) {
+async function GoogleLogin(code: any, res: any) {
   const tokensFound = await getGoogleTokens(code, res);
   if (!tokensFound) {
     console.error("Code Expired");
@@ -43,10 +43,10 @@ async function GoogleLogin(code, res) {
             name: userData?.name,
             email: userData?.email,
           },
-          process.env.REFRESH_TOKEN_SECRET
+          process.env.REFRESH_TOKEN_SECRET as any
         );
         console.log({ accessToken: accessToken, refreshToken: refreshToken });
-        const savedJwtRefreshToken = SaveJwtRefreshToken(
+        const savedJwtRefreshToken: any = SaveJwtRefreshToken(
           userData?.email,
           refreshToken
         );
@@ -82,7 +82,7 @@ async function GoogleLogin(code, res) {
             message: "Failed to save token",
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(error.message);
         res.status(400).send({
           message: "Logged in Failed",
@@ -97,7 +97,7 @@ async function GoogleLogin(code, res) {
   }
 }
 
-async function getGoogleTokens(code, res) {
+async function getGoogleTokens(code: any, res: any) {
   console.log("Code ", code);
   if (code) {
     try {
@@ -123,7 +123,7 @@ function getLink() {
   return authorizeUrl;
 }
 
-async function getGoogleUserData(google_access_token) {
+async function getGoogleUserData(google_access_token: any) {
   const oauth2Client2 = new google.auth.OAuth2(); // create new auth client
   oauth2Client2.setCredentials({
     access_token: google_access_token,
@@ -136,7 +136,7 @@ async function getGoogleUserData(google_access_token) {
   return data;
 }
 
-async function GetGoogleLoginLink(req, res) {
+async function GetGoogleLoginLink(req: any, res: any) {
   console.log(
     "🚀 ~ file: server.js:128 ~ app.get ~ req",
     req.get("origin"),

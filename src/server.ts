@@ -36,7 +36,7 @@ const app = express();
 
 connect(
   "mongodb+srv://himel:himel@cluster0.6uvuj.mongodb.net/familyTree",
-  (err) => {
+  function (err) {
     if (err) {
       console.error(err);
     } else {
@@ -109,7 +109,7 @@ app.post("/logout", async (req, res) => {
       await userTokens.deleteMany({});
       console.log("Refresh Tokens Deleted");
       res.status(200).send({ message: "Logged out!!" });
-    } catch (e) {
+    } catch (e: any) {
       console.log(e.message);
       res.status(400).send({ message: "Error!!" });
     }

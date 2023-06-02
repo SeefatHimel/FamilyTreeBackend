@@ -1,7 +1,7 @@
 import FamilyList from "../../models/familyList";
 import { v4 as uuidv4 } from "uuid";
 import FamilyMember from "../../models/familyMember";
-async function CreateFamily(req, res) {
+async function CreateFamily(req: any, res: any) {
   const data = req.body;
   console.log("🚀 ~ file: index.js:6 ~ CreateFamily ~ data", data);
   const oldFamily = await FamilyList.where("name").equals(data.name);
@@ -9,7 +9,7 @@ async function CreateFamily(req, res) {
     console.log("Name already Exists");
     await GetFamily(req, res);
   } else {
-    const newFamily = new FamilyList();
+    const newFamily: any = new FamilyList();
     newFamily.name = data.name;
     newFamily.id = uuidv4();
     newFamily.password = data.password;
@@ -17,7 +17,7 @@ async function CreateFamily(req, res) {
 
     // Save newFamily object to database
     try {
-      newFamily.save((err, FamilyList) => {
+      newFamily.save((err: any, FamilyList: any) => {
         if (err) {
           console.log(err);
           console.log("Failed to add Family.");
@@ -46,7 +46,7 @@ async function CreateFamily(req, res) {
   }
 }
 
-async function GetFamilyMembers(req, res) {
+async function GetFamilyMembers(req: any, res: any) {
   const familyId = req.query.familyId ? req.query.familyId : req.body.familyId;
 
   console.log("🚀 ~ file: index.js:51 ~ GetFamilyMembers ~ familyId", familyId);
@@ -58,7 +58,7 @@ async function GetFamilyMembers(req, res) {
   );
   if (familyName) {
     try {
-      const Members = new FamilyMember(familyId);
+      const Members = FamilyMember(familyId);
       const members = await Members.find();
       // console.log(
       //   "🚀 ~ file: index.js:56 ~ GetFamilyMembers ~ members",
@@ -84,7 +84,7 @@ async function GetFamilyMembers(req, res) {
     });
 }
 
-async function GetFamily(req, res) {
+async function GetFamily(req: any, res: any) {
   console.log("Name : ", req.body.name, " Pass : ", req.body.password);
   if (!req.body.name) {
     console.log("Request name was empty.");
@@ -95,7 +95,7 @@ async function GetFamily(req, res) {
   try {
     await FamilyList.findOne(
       { name: req.body.name },
-      async function (err, family) {
+      async function (err: any, family: any) {
         if (err) console.error(err);
         if (!family) {
           console.log("FamilyList not found.");
@@ -105,7 +105,7 @@ async function GetFamily(req, res) {
         } else {
           console.log("family > ", family);
           if (family.validPassword(req.body.password)) {
-            const Members = new FamilyMember(family.id);
+            const Members = FamilyMember(family.id);
             const members = await Members.find();
 
             res.cookie("activeFamilyID", family?.id, {

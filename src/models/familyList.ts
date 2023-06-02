@@ -10,7 +10,7 @@ const familySchema = new Schema({
   salt: String,
 });
 // Method to set salt and hash the password for a user
-familySchema.methods.setPassword = function (password) {
+familySchema.methods.setPassword = function (password: any) {
   // Creating a unique salt for a particular user
   this.salt = randomBytes(16).toString("hex");
 
@@ -22,7 +22,7 @@ familySchema.methods.setPassword = function (password) {
 };
 
 // Method to check the entered password is correct or not
-familySchema.methods.validPassword = function (password) {
+familySchema.methods.validPassword = function (password: any) {
   var hash = pbkdf2Sync(password, this.salt, 1000, 64, `sha512`).toString(
     `hex`
   );

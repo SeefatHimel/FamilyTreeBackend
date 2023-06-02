@@ -1,4 +1,4 @@
-function GetValidUserData(user) {
+function GetValidUserData(user: any) {
   return {
     id: user.id,
     email: user.email,

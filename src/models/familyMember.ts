@@ -10,7 +10,7 @@ const memberSchema = new Schema({
   spouse: { type: Array, required: true },
   children: { type: Array, required: true },
 });
-function dynamicFamilyMemberSchema(prefix) {
+function dynamicFamilyMemberSchema(prefix: any) {
   return model(prefix + ".members", memberSchema);
 }
 

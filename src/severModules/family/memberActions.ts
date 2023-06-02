@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import FamilyMember from "../../models/familyMember";
-async function AddMember(req, res) {
+async function AddMember(req: any, res: any) {
   const { familyId, data, memId } = req.body;
-  const Members = new FamilyMember(familyId);
+  const Members = FamilyMember(familyId);
   let tmpMem = await Members.where("id").equals(memId).clone();
 
   if (data.relation === "Sibling") {
@@ -40,7 +40,7 @@ async function AddMember(req, res) {
       Members.findByIdAndUpdate(
         rMember._id,
         rMember,
-        function (err, updatedData) {
+        function (err: any, updatedData: any) {
           if (err) {
             console.log(err);
           } else {
@@ -72,7 +72,7 @@ async function AddMember(req, res) {
     }
   }
 }
-async function AddOriginMember(req, res) {
+async function AddOriginMember(req: any, res: any) {
   const { familyId, data, memId } = req.body;
   console.log(
     "🚀 ~ file: memberActions.js:79 ~ AddOriginMember ~ memId:",
@@ -80,7 +80,7 @@ async function AddOriginMember(req, res) {
     data,
     memId
   );
-  const Members = new FamilyMember(familyId);
+  const Members = FamilyMember(familyId);
   const sameName = await Members.where("name").equals(data.name).clone();
   if (sameName && sameName[0]) {
     console.log("sameName", sameName);
@@ -89,32 +89,15 @@ async function AddOriginMember(req, res) {
     });
   } else {
     try {
-      let parents = [];
-      let children = [];
-      let spouse = [];
       const newMemberId = uuidv4();
-      if (data?.relation) {
-        if (data.relation === "Parent") {
-          children.push(rMember.id);
-          rMember.parents.push(newMemberId);
-        }
-        if (data.relation === "Child" || data.relation === "Sibling") {
-          parents.push(rMember.id);
-          rMember.children.push(newMemberId);
-        }
-        if (data.relation === "Spouse") {
-          spouse.push(rMember.id);
-          rMember.spouse.push(newMemberId);
-        }
-      }
       const member = await Members.create({
         id: newMemberId,
         name: data.name,
         imgLink: data.imgLink,
         gender: data.gender,
-        parents: parents,
-        children: children,
-        spouse: spouse,
+        parents: [],
+        children: [],
+        spouse: [],
       });
 
       console.log("Origin Member Added ", member);
@@ -129,17 +112,17 @@ async function AddOriginMember(req, res) {
     }
   }
 }
-async function DeleteChildren(Members, id) {
+async function DeleteChildren(Members: any, id: any) {
   console.log("🚀 ~ file: addMember.js:75 ~ DeleteChildren ~ id", id);
   let tmpMem = await Members.where("id").equals(id).clone();
   const member = tmpMem[0];
 
-  let childDeleted = true;
+  let childDeleted: any = true;
   if (member) {
     if (member.children.length > 0) {
       member.children.map(
-        (childDeleted *= async (childId) =>
-          await DeleteChildren(Members, childId))
+        (childDeleted *= (async (childId: any) =>
+          await DeleteChildren(Members, childId)) as any)
       );
     }
     try {
@@ -151,12 +134,12 @@ async function DeleteChildren(Members, id) {
   } else return true;
 }
 
-async function DeleteMember(req, res) {
+async function DeleteMember(req: any, res: any) {
   const { familyId, memId } = req.body;
-  const Members = new FamilyMember(familyId);
+  const Members = FamilyMember(familyId);
   let tmpMem = await Members.where("id").equals(memId).clone();
   const member = tmpMem[0];
-  let childDeleted = true;
+  let childDeleted: any = true;
   if (!member) {
     res.status(201).send({
       message: "Was Already Deleted.",
@@ -168,8 +151,8 @@ async function DeleteMember(req, res) {
     );
     if (member?.children?.length > 0) {
       member.children.map(
-        async (childId) =>
-          (childDeleted *= await DeleteChildren(Members, childId))
+        async (childId: any) =>
+          (childDeleted *= (await DeleteChildren(Members, childId)) as any)
       );
     }
     console.log(
@@ -184,12 +167,12 @@ async function DeleteMember(req, res) {
         const parent = tmpParent[0];
         if (parent) {
           parent.children = parent.children.filter(
-            (childId) => childId != memId
+            (childId: any) => childId != memId
           );
           Members.findByIdAndUpdate(
             parent._id,
             parent,
-            function (err, updatedData) {
+            function (err: any, updatedData: any) {
               if (err) {
                 console.log(err);
                 console.log("Parent Update failed");
@@ -218,7 +201,7 @@ async function DeleteMember(req, res) {
           Members.findByIdAndUpdate(
             spouse._id,
             spouse,
-            function (err, updatedData) {
+            function (err: any, updatedData: any) {
               if (err) {
                 console.log(err);
               } else {
@@ -248,14 +231,14 @@ async function DeleteMember(req, res) {
   }
 }
 
-async function UpdateMember(req, res) {
+async function UpdateMember(req: any, res: any) {
   const { familyId, data, memId } = req.body;
   console.log(
     "🚀 ~ file: memberActions.js:247 ~ UpdateMember ~ familyId, data",
     familyId,
     data
   );
-  const Members = new FamilyMember(familyId);
+  const Members = FamilyMember(familyId);
   let tmpMem = await Members.where("id").equals(data.id).clone();
   const rMember = tmpMem[0];
   console.log(
@@ -280,7 +263,7 @@ async function UpdateMember(req, res) {
       Members.findByIdAndUpdate(
         rMember._id,
         rMember,
-        function (err, updatedData) {
+        function (err: any, updatedData: any) {
           if (err) {
             console.log(err);
           } else {

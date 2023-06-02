@@ -1,7 +1,7 @@
 import User from "../../models/user";
 import { SaveUserToDB } from "../../services/mongoDBService";
 
-async function RegisterUser(userReq, res) {
+async function RegisterUser(userReq: any, res: any) {
   console.log("registerUser > ", userReq);
   const emailValid = await check_email_in_DB(userReq.email);
   if (emailValid) {
@@ -13,13 +13,13 @@ async function RegisterUser(userReq, res) {
     return false;
   }
 }
-async function check_email_in_DB(email) {
+async function check_email_in_DB(email: any) {
   const oldEmail = await User.where("email").equals(email);
   console.log("oldEmail : ", oldEmail[0]);
   if (oldEmail && oldEmail[0]) return false;
   return true;
 }
-async function CheckEmailValidity(req, res) {
+async function CheckEmailValidity(req: any, res: any) {
   console.log("Email > ", req.body.data);
   const validEmail = await check_email_in_DB(req.body.data.email);
   console.log("Valid Email : ", validEmail);

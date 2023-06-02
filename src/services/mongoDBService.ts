@@ -4,31 +4,31 @@ import user from "../models/user";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 
-async function SaveToDB(name, email) {
+async function SaveToDB(name: any, email: any) {
   const oldUser = await user.where("email").equals(email);
   console.log(oldUser[0]);
   if (oldUser[0]) {
     console.log("User already Exists");
   } else {
     try {
-      const user = await User.create({
+      const newUser = await user.create({
         id: uuidv4(),
         name: name,
         email: email,
       });
-      console.log("User Added ", user);
-      return user.id;
-    } catch (e) {
+      console.log("User Added ", newUser);
+      return newUser.id;
+    } catch (e: any) {
       console.log(e.message);
       return false;
     }
   }
   return oldUser[0].id;
 }
-async function GetDataFromDBbyEmail(email) {
+async function GetDataFromDBbyEmail(email: any) {
   console.log("GetDataFromDBbyEmail > ", email);
   try {
-    const userData = await User.where("email").equals(email);
+    const userData = await user.where("email").equals(email);
     console.log(
       "🚀 ~ file: mongoDBService.js:29 ~ GetDataFromDBbyEmail ~ userData",
       userData
@@ -39,14 +39,14 @@ async function GetDataFromDBbyEmail(email) {
     return -1;
   }
 }
-async function SaveUserToDB(userReq, res) {
-  const oldUser = await User.where("email").equals(userReq.email);
+async function SaveUserToDB(userReq: any, res: any) {
+  const oldUser = await user.where("email").equals(userReq.email);
   console.log("28");
   console.log(oldUser[0]);
   if (oldUser[0]) {
     console.log("User already Exists");
   } else {
-    const newUser = new User();
+    const newUser: any = new user();
     newUser.name = userReq.firstName + " " + userReq.lastName;
     newUser.id = uuidv4();
     newUser.email = userReq.email;
@@ -55,7 +55,7 @@ async function SaveUserToDB(userReq, res) {
 
     // Save newUser object to database
     try {
-      newUser.save((err, User) => {
+      newUser.save((err: any, User: any) => {
         if (err) {
           console.log(err);
           console.log("Failed to add user.");
@@ -79,20 +79,24 @@ async function SaveUserToDB(userReq, res) {
   }
 }
 
-async function getLoggedInUser(token) {
+async function getLoggedInUser(token: any) {
   let tmp;
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
-    console.log("User > ", data);
-    tmp = data;
-  });
+  jwt.verify(
+    token,
+    process.env.ACCESS_TOKEN_SECRET as any,
+    (err: any, data: any) => {
+      console.log("User > ", data);
+      tmp = data;
+    }
+  );
   return tmp;
 }
 
-async function GetUserInfo(req, res) {
+async function GetUserInfo(req: any, res: any) {
   const authToken = req.headers["authorization"].split(" ")[1];
   console.log("/getData", authToken);
 
-  const loggedInUser = await getLoggedInUser(authToken);
+  const loggedInUser: any = await getLoggedInUser(authToken);
   console.log("/getData > user > ", loggedInUser);
   if (!loggedInUser) {
     console.log("User Not Found");
@@ -102,7 +106,7 @@ async function GetUserInfo(req, res) {
   }
 
   console.log("in data");
-  const data = await GetDataFromDBbyEmail(loggedInUser.email);
+  const data = await GetDataFromDBbyEmail(loggedInUser?.email);
   // console.log("data>>> ", data);
   // console.log(">>>>>>>", data?.name, data?.email);
   if (data === -1) {
