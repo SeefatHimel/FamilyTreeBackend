@@ -36,7 +36,7 @@ const app = express();
 
 connect(
   "mongodb+srv://himel:himel@cluster0.6uvuj.mongodb.net/familyTree",
-  (err, result) => {
+  (err) => {
     if (err) {
       console.error(err);
     } else {
