@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+
 import User from "../../models/user";
 import { GetDataFromDBbyEmail } from "../../services/mongoDBService";
 import {
@@ -5,9 +8,7 @@ import {
   SaveJwtRefreshToken,
 } from "../../services/tokenService";
 import { GetValidUserData } from "../../services/userData";
-import jwt from "jsonwebtoken";
 
-import dotenv from "dotenv";
 dotenv.config();
 
 async function signIn(req: any, res: any) {

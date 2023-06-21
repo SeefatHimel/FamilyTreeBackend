@@ -6,7 +6,7 @@
     "build": "tsc --outDir dist",
     "start:dev": "ts-node src/server.ts",
     "start": "node -r ts-node/register src/server.ts",
-    "dev": "nodemon --experimental-specifier-resolution=node src/server.ts"
+    "dev": "nodemon src/server.ts"
   },
   "author": "himel",
   "license": "ISC",
