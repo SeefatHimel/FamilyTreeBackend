@@ -7,7 +7,7 @@ import {
   GenerateJwtAccessToken,
   SaveJwtRefreshToken,
 } from "../../services/tokenService";
-import { GetValidUserData } from "../../services/userData";
+import { GetValidUserData } from "../../helpers/userData";
 
 dotenv.config();
 
