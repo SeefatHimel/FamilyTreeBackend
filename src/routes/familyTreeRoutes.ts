@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { GetGoogleLoginLink } from "../severModules/auth/googleSignIn";
 import { AuthenticateJwtAccessToken } from "../services/tokenService";
-import { CreateFamily, GetFamilyMembers } from "../severModules/family";
+import {
+  CreateFamily,
+  GetFamilyList,
+  GetFamilyMembers,
+} from "../severModules/family";
 import {
   AddMember,
   AddOriginMember,
@@ -27,7 +31,15 @@ FamilyTreeRouter.route("/enter").post(
 FamilyTreeRouter.route("/getDetails").get(
   AuthenticateJwtAccessToken,
   async (req, res) => {
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>> in");
+
     GetFamilyMembers(req, res);
+  }
+);
+FamilyTreeRouter.route("/getFamilyList").get(
+  AuthenticateJwtAccessToken,
+  async (req, res) => {
+    GetFamilyList(req, res);
   }
 );
 

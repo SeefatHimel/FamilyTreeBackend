@@ -1,19 +1,26 @@
-import FamilyList from "../../models/familyList";
+import { FamilyListInterface } from "interfaces";
 import { v4 as uuidv4 } from "uuid";
+
+import FamilyList from "../../models/familyList";
 import FamilyMember from "../../models/familyMember";
+import { GetUserInfo } from "../../services/tokenService";
+
 async function CreateFamily(req: any, res: any) {
-  const data = req.body;
+  const data: any = req.body;
   console.log("🚀 ~ file: index.js:6 ~ CreateFamily ~ data", data);
   const oldFamily = await FamilyList.where("name").equals(data.name);
   if (oldFamily && oldFamily[0]) {
     console.log("Name already Exists");
     await GetFamily(req, res);
   } else {
-    const newFamily: any = new FamilyList();
+    const newFamily: FamilyListInterface = new FamilyList();
     newFamily.name = data.name;
     newFamily.id = uuidv4();
-    newFamily.password = data.password;
-    newFamily.setPassword(data.password);
+    if (newFamily.setPassword) newFamily.setPassword(data.password as any);
+    const userInfo: any = await GetUserInfo(req);
+    newFamily.creator = userInfo?.id;
+
+    newFamily.users = [userInfo?.id];
 
     // Save newFamily object to database
     try {
@@ -48,18 +55,40 @@ async function CreateFamily(req: any, res: any) {
 
 async function GetFamilyMembers(req: any, res: any) {
   const familyId = req.query.familyId ? req.query.familyId : req.body.familyId;
+  console.log(
+    "🚀 ~ file: index.ts:58 ~ GetFamilyMembers ~ familyId:",
+    familyId
+  );
+  const userInfo = await GetUserInfo(req);
+  if (!userInfo) {
+    return res.status(404).send({
+      message: "User Not Found",
+    });
+  }
 
   console.log("🚀 ~ file: index.js:51 ~ GetFamilyMembers ~ familyId", familyId);
-  const fDetails = await FamilyList.where("id").equals(familyId);
-  const familyName = fDetails[0].name;
+  const fDetails = await FamilyList.findOne({ id: familyId });
+
+  console.log(
+    "🚀 ~ file: index.ts:67 ~ GetFamilyMembers ~ fDetails:",
+    fDetails
+  );
+  // .where("id").equals(familyId);
+
+  if (!fDetails) {
+    return res.status(404).send({
+      message: "Family Not Found",
+    });
+  }
+
+  const familyName = fDetails?.name;
   console.log(
     "🚀 ~ file: index.js:54 ~ GetFamilyMembers ~ familyName",
     familyName
   );
   if (familyName) {
     try {
-      const Members = FamilyMember(familyId);
-      const members = await Members.find();
+      const members = await FamilyMember.find({ familyId });
       // console.log(
       //   "🚀 ~ file: index.js:56 ~ GetFamilyMembers ~ members",
       //   members
@@ -78,10 +107,7 @@ async function GetFamilyMembers(req: any, res: any) {
         message: "Failed to Acquire Family Details",
       });
     }
-  } else
-    res.status(404).send({
-      message: "Family Not Found",
-    });
+  }
 }
 
 async function GetFamily(req: any, res: any) {
@@ -105,8 +131,7 @@ async function GetFamily(req: any, res: any) {
         } else {
           console.log("family > ", family);
           if (family.validPassword(req.body.password)) {
-            const Members = FamilyMember(family.id);
-            const members = await Members.find();
+            const members = await FamilyMember.find({ familyId: family?.id });
 
             res.cookie("activeFamilyID", family?.id, {
               secure: true,
@@ -137,4 +162,33 @@ async function GetFamily(req: any, res: any) {
     });
   }
 }
-export { CreateFamily, GetFamilyMembers };
+
+async function GetFamilyList(req: any, res: any) {
+  const userInfo: any = await GetUserInfo(req);
+  console.log("🚀 ~ file: index.ts:145 ~ GetFamilyList ~ userInfo:", userInfo);
+
+  // Save newFamily object to database
+  try {
+    const families = await FamilyList.find({ users: { $in: [userInfo.id] } })
+      .select("id name createdAt updatedAt creator originMember users viewers")
+      .exec();
+    if (!families || families.length === 0) {
+      console.log("FamilyList not found.");
+      return res.status(400).send({
+        message: "FamilyList not found.",
+      });
+    } else {
+      console.log("families > ", families);
+      res.send(families);
+      console.log("...............................");
+    }
+  } catch (error) {
+    console.log("error > ", error);
+    console.log("Failed to add Family.");
+    return res.status(400).send({
+      message: "Failed to add Family.",
+    });
+  }
+}
+
+export { CreateFamily, GetFamilyMembers, GetFamilyList };

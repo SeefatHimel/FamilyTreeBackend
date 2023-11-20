@@ -1,5 +1,6 @@
 import { connect } from "mongoose";
-const dbUrl = "mongodb+srv://himel:himel@cluster0.6uvuj.mongodb.net/familyTree";
+const dbUrl =
+  "mongodb+srv://himel:himel@cluster0.6uvuj.mongodb.net/familyTreeV2";
 function ConnectDatabase() {
   const url = process.env.DATABASE_URL as any;
   console.log("🚀 ~ file: databaseConfig.ts:5 ~ ConnectDatabase ~ url:", url);

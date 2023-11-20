@@ -2,6 +2,7 @@ import pkg from "jsonwebtoken";
 const { sign, verify } = pkg;
 import dotenv from "dotenv";
 import UserTokens from "../models/userTokens";
+import { UserInfo } from "interfaces";
 dotenv.config();
 
 async function GenerateJwtAccessToken({ id, name, email }: any) {
@@ -23,6 +24,10 @@ async function GenerateJwtAccessToken({ id, name, email }: any) {
 async function SaveJwtRefreshToken(email: any, refresh_token: any) {
   const oldToken = await UserTokens.where("refresh_token").equals(
     refresh_token
+  );
+  console.log(
+    "🚀 ~ file: tokenService.ts:28 ~ SaveJwtRefreshToken ~ oldToken:",
+    oldToken
   );
   console.log(oldToken);
   if (oldToken[0]) {
@@ -116,10 +121,38 @@ async function AuthenticateJwtAccessToken(req: any, res: any, next: any) {
     );
   }
 }
+async function GetUserInfo(req: any): Promise<UserInfo | null> {
+  const authHeader = req.headers["authorization"];
+  console.log("authHeader ", authHeader);
+  const token = authHeader && authHeader.split(" ")[1];
+  console.log(">>>>  JwtAccessToken ", token);
+  let res = null;
+  if (!token) {
+    console.log("Token not found!");
+    return null;
+  } else {
+    verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET as any,
+      (err: any, data: any) => {
+        console.log("AccessToken data ", data);
+        if (err) {
+          console.log("AccessToken Expired");
+          return null;
+        } else {
+          res = data;
+          return data;
+        }
+      }
+    );
+  }
+  return res;
+}
 
 export {
   GenerateJwtAccessToken,
   SaveJwtRefreshToken,
   GetJwtAccessToken,
   AuthenticateJwtAccessToken,
+  GetUserInfo,
 };

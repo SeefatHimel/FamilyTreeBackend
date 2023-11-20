@@ -6,6 +6,10 @@ const familySchema = new Schema({
   name: { type: String, required: true },
   createdAt: { type: Date, immutable: true, default: () => Date.now() },
   updatedAt: { type: Date, default: () => Date.now() },
+  creator: { type: String, required: true },
+  originMember: { type: String, default: null },
+  users: { type: [String] },
+  viewers: { type: [String] },
   hash: String,
   salt: String,
 });

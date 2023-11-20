@@ -7,6 +7,7 @@ const userSchema = new Schema({
   email: { type: String, required: true, lowercase: true },
   createdAt: { type: Date, immutable: true, default: () => Date.now() },
   updatedAt: { type: Date, default: () => Date.now() },
+  image: String,
   hash: String,
   salt: String,
 });

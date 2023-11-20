@@ -2,16 +2,23 @@ import { v4 as uuidv4 } from "uuid";
 import FamilyMember from "../../models/familyMember";
 async function AddMember(req: any, res: any) {
   const { familyId, data, memId } = req.body;
-  const Members = FamilyMember(familyId);
-  let tmpMem = await Members.where("id").equals(memId).clone();
+  let tmpMem = await FamilyMember.where("id").equals(memId).clone();
 
   if (data.relation === "Sibling") {
-    tmpMem = await Members.where("id").equals(tmpMem[0].parents[0]).clone();
+    tmpMem = await FamilyMember.where("familyId")
+      .equals(tmpMem[0].familyId)
+      .where("id")
+      .equals(tmpMem[0].parents[0])
+      .clone();
   }
   const rMember = tmpMem[0];
   console.log("🚀 ~ file: addMember.js:10 ~ AddMember ~ rMember", rMember);
 
-  const sameName = await Members.where("name").equals(data.name).clone();
+  const sameName = await FamilyMember.where("familyId")
+    .equals(tmpMem[0].familyId)
+    .where("name")
+    .equals(data.name)
+    .clone();
   if (sameName && sameName[0]) {
     console.log("sameName", sameName);
     res.status(401).send({
@@ -37,7 +44,7 @@ async function AddMember(req: any, res: any) {
           rMember.spouse.push(newMemberId);
         }
       }
-      Members.findByIdAndUpdate(
+      FamilyMember.findByIdAndUpdate(
         rMember._id,
         rMember,
         function (err: any, updatedData: any) {
@@ -50,8 +57,9 @@ async function AddMember(req: any, res: any) {
           }
         }
       ).clone;
-      const member = await Members.create({
+      const member = await FamilyMember.create({
         id: newMemberId,
+        familyId: tmpMem[0].familyId,
         name: data.name,
         imgLink: data.imgLink ? data.imgLink : null,
         gender: data.gender,
@@ -80,8 +88,11 @@ async function AddOriginMember(req: any, res: any) {
     data,
     memId
   );
-  const Members = FamilyMember(familyId);
-  const sameName = await Members.where("name").equals(data.name).clone();
+  const sameName = await FamilyMember.where("familyId")
+    .equals(familyId)
+    .where("name")
+    .equals(data.name)
+    .clone();
   if (sameName && sameName[0]) {
     console.log("sameName", sameName);
     res.status(401).send({
@@ -90,8 +101,9 @@ async function AddOriginMember(req: any, res: any) {
   } else {
     try {
       const newMemberId = uuidv4();
-      const member = await Members.create({
+      const member = await FamilyMember.create({
         id: newMemberId,
+        familyId: familyId,
         name: data.name,
         imgLink: data.imgLink,
         gender: data.gender,
@@ -112,21 +124,21 @@ async function AddOriginMember(req: any, res: any) {
     }
   }
 }
-async function DeleteChildren(Members: any, id: any) {
+async function DeleteChildren(id: any) {
   console.log("🚀 ~ file: addMember.js:75 ~ DeleteChildren ~ id", id);
-  let tmpMem = await Members.where("id").equals(id).clone();
+  let tmpMem = await FamilyMember.where("id").equals(id).clone();
   const member = tmpMem[0];
 
   let childDeleted: any = true;
   if (member) {
     if (member.children.length > 0) {
       member.children.map(
-        (childDeleted *= (async (childId: any) =>
-          await DeleteChildren(Members, childId)) as any)
+        (async (childId: any) =>
+          (childDeleted *= await DeleteChildren(childId as any))) as any
       );
     }
     try {
-      await Members.deleteOne({ id: id });
+      await FamilyMember.deleteOne({ id: id });
     } catch (error) {
       return false;
     }
@@ -136,8 +148,11 @@ async function DeleteChildren(Members: any, id: any) {
 
 async function DeleteMember(req: any, res: any) {
   const { familyId, memId } = req.body;
-  const Members = FamilyMember(familyId);
-  let tmpMem = await Members.where("id").equals(memId).clone();
+  let tmpMem = await FamilyMember.where("familyId")
+    .equals(familyId)
+    .where("id")
+    .equals(memId)
+    .clone();
   const member = tmpMem[0];
   let childDeleted: any = true;
   if (!member) {
@@ -152,7 +167,7 @@ async function DeleteMember(req: any, res: any) {
     if (member?.children?.length > 0) {
       member.children.map(
         async (childId: any) =>
-          (childDeleted *= (await DeleteChildren(Members, childId)) as any)
+          (childDeleted *= (await DeleteChildren(childId)) as any)
       );
     }
     console.log(
@@ -161,7 +176,7 @@ async function DeleteMember(req: any, res: any) {
     );
     if (childDeleted) {
       if (member?.parents?.length > 0) {
-        let tmpParent = await Members.where("id")
+        let tmpParent = await FamilyMember.where("id")
           .equals(member.parents[0])
           .clone();
         const parent = tmpParent[0];
@@ -169,7 +184,7 @@ async function DeleteMember(req: any, res: any) {
           parent.children = parent.children.filter(
             (childId: any) => childId != memId
           );
-          Members.findByIdAndUpdate(
+          FamilyMember.findByIdAndUpdate(
             parent._id,
             parent,
             function (err: any, updatedData: any) {
@@ -185,20 +200,20 @@ async function DeleteMember(req: any, res: any) {
         }
       }
       if (member.spouse.length > 0) {
-        let tmpSpouse = await Members.where("id")
+        let tmpSpouse = await FamilyMember.where("id")
           .equals(member.spouse[0])
           .clone();
         const spouse = tmpSpouse[0];
         if (spouse.parents.length === 0) {
           try {
-            await Members.deleteOne({ id: member.spouse[0] });
+            await FamilyMember.deleteOne({ id: member.spouse[0] });
             console.log("Spouse removed");
           } catch (error) {
             console.log("Spouse remove failed");
           }
         } else {
           spouse.spouse = [];
-          Members.findByIdAndUpdate(
+          FamilyMember.findByIdAndUpdate(
             spouse._id,
             spouse,
             function (err: any, updatedData: any) {
@@ -214,7 +229,7 @@ async function DeleteMember(req: any, res: any) {
         }
       }
       try {
-        await Members.deleteOne({ id: memId });
+        await FamilyMember.deleteOne({ id: memId });
         res.status(201).send({
           message: "Member Deleted successfully.",
         });
@@ -238,15 +253,18 @@ async function UpdateMember(req: any, res: any) {
     familyId,
     data
   );
-  const Members = FamilyMember(familyId);
-  let tmpMem = await Members.where("id").equals(data.id).clone();
+  let tmpMem = await FamilyMember.where("id").equals(data.id).clone();
   const rMember = tmpMem[0];
   console.log(
     "🚀 ~ file: memberActions.js:273 ~ UpdateMember ~ rMember:",
     rMember,
     data
   );
-  const sameName = await Members.where("name").equals(data.name).clone();
+  const sameName = await FamilyMember.where("familyId")
+    .equals(familyId)
+    .where("name")
+    .equals(data.name)
+    .clone();
   console.log("Check 1");
   if (sameName[0] && sameName[0]?.id !== data.id) {
     console.log("sameName", sameName);
@@ -260,7 +278,7 @@ async function UpdateMember(req: any, res: any) {
         rMember.imgLink = data.imgLink;
       }
 
-      Members.findByIdAndUpdate(
+      FamilyMember.findByIdAndUpdate(
         rMember._id,
         rMember,
         function (err: any, updatedData: any) {
